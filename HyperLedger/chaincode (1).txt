@@ -1,0 +1,75 @@
+cd ~/hyperledger-fabric/fabric-samples/chaincode
+
+mkdir doc-storage
+cd doc-storage
+
+nano doc_storage.go
+
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+)
+
+// Document structure for storing hash and CID
+type Document struct {
+	Hash string `json:"hash"`
+	CID  string `json:"cid"`
+}
+
+// SmartContract provides functions for managing documents
+type SmartContract struct {
+	contractapi.Contract
+}
+
+// StoreDocument stores a document hash and CID
+func (s *SmartContract) StoreDocument(ctx contractapi.TransactionContextInterface, docID string, hash string, cid string) error {
+	existingDoc, err := ctx.GetStub().GetState(docID)
+	if err != nil {
+		return fmt.Errorf("failed to check document existence: %v", err)
+	}
+	if existingDoc != nil {
+		return fmt.Errorf("document with ID %s already exists", docID)
+	}
+
+	doc := Document{Hash: hash, CID: cid}
+	docJSON, err := json.Marshal(doc)
+	if err != nil {
+		return fmt.Errorf("failed to marshal document: %v", err)
+	}
+
+	return ctx.GetStub().PutState(docID, docJSON)
+}
+
+// RetrieveDocument retrieves document details using docID
+func (s *SmartContract) RetrieveDocument(ctx contractapi.TransactionContextInterface, docID string) (*Document, error) {
+	docJSON, err := ctx.GetStub().GetState(docID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read document: %v", err)
+	}
+	if docJSON == nil {
+		return nil, fmt.Errorf("document with ID %s not found", docID)
+	}
+
+	var doc Document
+	err = json.Unmarshal(docJSON, &doc)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal document: %v", err)
+	}
+
+	return &doc, nil
+}
+
+func main() {
+	chaincode, err := contractapi.NewChaincode(new(SmartContract))
+	if err != nil {
+		fmt.Printf("Error creating chaincode: %v", err)
+		return
+	}
+
+	if err := chaincode.Start(); err != nil {
+		fmt.Printf("Error starting chaincode: %v", err)
+	}
+}

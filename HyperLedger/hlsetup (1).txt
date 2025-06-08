@@ -1,0 +1,32 @@
+cd ~/hyperledger-fabric/fabric-samples/test-network
+
+docker system prune -a --volumes
+
+./network.sh up createChannel
+
+docker ps
+
+
+cd ~/hyperledger-fabric/fabric-samples/chaincode/doc-storage
+go mod init doc-storage
+go mod tidy
+
+
+cd ~/hyperledger-fabric/fabric-samples/test-network
+
+./network.sh deployCC -ccn docstorage -ccp ../chaincode/doc-storage -ccl go
+
+
+#Invoke the chaincode using both peers for endorsement:
+peer chaincode invoke -o localhost:7050 \
+--tls \
+--cafile ${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem \
+-C mychannel \
+-n docstorage \
+--peerAddresses localhost:7051 \
+--tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
+--peerAddresses localhost:9051 \
+--tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
+-c '{"function":"StoreDocument","Args":["doc1","abcd1234hash","QmTzQ1iLhRYtP9qpV6T43B5tUGLVzZZzD1WxgC7K6b7AgH"]}'
+
+peer chaincode query -C mychannel -n docstorage -c '{"function":"RetrieveDocument","Args":["doc1"]}'
