@@ -1,0 +1,10 @@
+Flask
+torch
+torchvision
+opencv-python
+matplotlib
+tensorflow
+scikit-learn
+ultralytics
+roboflow
+Pillow
