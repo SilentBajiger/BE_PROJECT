@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Box, TextField, Button, Typography, Paper } from '@mui/material';
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  CircularProgress,
+  Divider,
+} from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
-import {CircularProgress} from '@mui/material';
 import axios from 'axios';
 import uploadToDrive from './UploadToDrive';
 
@@ -9,7 +16,7 @@ const Admission = () => {
   const [documents, setDocuments] = useState([]);
   const [docsLinksToCollege, setDocsLinksToCollege] = useState([]);
   const [gotDoc, setGotDoc] = useState("Not Yet");
-  const [loading,setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     userId: '',
     fullName: '',
@@ -18,7 +25,8 @@ const Admission = () => {
     documents: null,
   });
 
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const fetchFromMySystem = () => {
     return new Promise((resolve) => {
@@ -28,7 +36,7 @@ const Admission = () => {
         if (event.data.type === "DOCS_SELECTED") {
           setDocuments(event.data.docs.downloadedDocs);
           setFormData((prev) => ({ ...prev, userId: event.data.docs.userId }));
-          setGotDoc("GOT IT");
+          setGotDoc("GOT IT ✅");
           window.removeEventListener("message", listener);
           popup.close();
           resolve();
@@ -38,7 +46,8 @@ const Admission = () => {
     });
   };
 
-  const handleFileChange = (e) => setFormData({ ...formData, document: e.target.files[0] });
+  const handleFileChange = (e) =>
+    setFormData({ ...formData, document: e.target.files[0] });
 
   const handleUrlGeneration = async () => {
     try {
@@ -50,7 +59,7 @@ const Admission = () => {
       );
       setDocsLinksToCollege(uploaded);
     } catch (err) {
-      alert("Error uploading documents (line 84)");
+      alert("Error uploading documents.");
       console.error(err);
     }
   };
@@ -59,22 +68,23 @@ const Admission = () => {
     try {
       await axios.post('http://localhost:5001/user/submit-form', {
         ...formData,
-        documents: docsLinksToCollege
+        documents: docsLinksToCollege,
       });
       console.log("Form submitted successfully");
+      alert("✅ Form Submitted Successfully!");
       setFormData({
         userId: '',
-    fullName: '',
-    contact: '',
-    email: '',
-    documents: null,
+        fullName: '',
+        contact: '',
+        email: '',
+        documents: null,
       });
       setDocuments([]);
       setDocsLinksToCollege([]);
+      setGotDoc("Not Yet");
       setLoading(false);
-      alert("Form Submitted Successfully")
     } catch (err) {
-      alert("Error submitting form (line 122)");
+      alert("Error submitting form.");
       console.error(err);
     }
   };
@@ -86,12 +96,12 @@ const Admission = () => {
   }, [docsLinksToCollege]);
 
   const handleSubmit = async () => {
-    if(formData.contact === '' || formData.fullName === '' || formData.email === ''){
-      alert('Plz Fill All the Details');
+    if (!formData.contact || !formData.fullName || !formData.email) {
+      alert('⚠️ Please fill all the details');
       return;
     }
-    if(documents.length === 0){
-      alert("Plz Fetch Atleast one Document");
+    if (documents.length === 0) {
+      alert("⚠️ Please fetch at least one document");
       return;
     }
     setLoading(true);
@@ -103,24 +113,27 @@ const Admission = () => {
       component={Paper}
       elevation={10}
       sx={{
-        maxWidth: 500,
+        Width: '100%',
+        height: '100%',
         mx: 'auto',
         mt: 10,
         p: 5,
         borderRadius: 5,
-        bgcolor: '#ffffff',
-        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+        background: 'linear-gradient(to right,rgb(229, 203, 250),rgb(255, 199, 233))',
+        boxShadow: '0 10px 35px rgba(0, 0, 0, 0.08)',
       }}
     >
       <Typography
         variant="h4"
         align="center"
         gutterBottom
-        sx={{ fontWeight: 'bold', color: 'primary.main' }}
+        sx={{ fontWeight: 700, color: '#2c3e50' }}
       >
         🎓 Admission Form
       </Typography>
-  
+
+      <Divider sx={{ mb: 3 }} />
+
       <TextField
         fullWidth
         label="Full Name"
@@ -129,7 +142,6 @@ const Admission = () => {
         onChange={handleChange}
         margin="normal"
         variant="outlined"
-        sx={{ borderRadius: 2 }}
       />
       <TextField
         fullWidth
@@ -139,7 +151,6 @@ const Admission = () => {
         onChange={handleChange}
         margin="normal"
         variant="outlined"
-        sx={{ borderRadius: 2 }}
       />
       <TextField
         fullWidth
@@ -149,9 +160,8 @@ const Admission = () => {
         onChange={handleChange}
         margin="normal"
         variant="outlined"
-        sx={{ borderRadius: 2 }}
       />
-  
+
       <Button
         variant="outlined"
         component="label"
@@ -159,26 +169,26 @@ const Admission = () => {
         startIcon={<UploadFileIcon />}
         sx={{
           mt: 3,
-          textTransform: 'none',
           borderRadius: 2,
-          fontWeight: 500,
-          borderColor: 'primary.main',
-          color: 'primary.main',
+          fontWeight: 600,
+          textTransform: 'none',
+          color: '#2c3e50',
+          borderColor: '#2c3e50',
           '&:hover': {
-            bgcolor: 'primary.main',
+            backgroundColor: '#2c3e50',
             color: '#fff',
           },
         }}
         onClick={fetchFromMySystem}
       >
-        Fetch My Document
+        📂 Fetch My Document
       </Button>
-  
+
       <input type="file" hidden onChange={handleFileChange} />
-  
+
       {documents.length > 0 && (
         <Box mt={2}>
-          <Typography variant="subtitle2" color="text.secondary">
+          <Typography variant="subtitle2" color="text.secondary" mb={1}>
             📄 Selected Documents:
           </Typography>
           {documents.map((doc, i) => (
@@ -188,37 +198,42 @@ const Admission = () => {
           ))}
         </Box>
       )}
-  
+
       <Button
         variant="contained"
-        color="primary"
         fullWidth
         sx={{
-          mt: 3,
+          mt: 4,
           py: 1.5,
           borderRadius: 3,
-          textTransform: 'none',
           fontWeight: 600,
           fontSize: '1rem',
-          background:loading?'#B0C5F1':'#4E73DF',
+          textTransform: 'none',
+          background: loading ? '#a5b8e3' : '#4E73DF',
         }}
         onClick={handleSubmit}
+        disabled={loading}
       >
-        
-        {loading ? <><CircularProgress size={28}/></>:"🚀 Submit"}
+        {loading ? <CircularProgress size={26} color="inherit" /> : '🚀 Submit'}
       </Button>
-  
+
       <Typography
         variant="body2"
         align="center"
         mt={3}
-        color={gotDoc === 'GOT IT' ? 'success.main' : 'text.secondary'}
-        sx={{ fontStyle: 'italic' }}
+        sx={{
+          fontStyle: 'italic',
+          fontWeight: 'bold',
+          color: gotDoc === 'GOT IT ✅' ? 'green' : 'gray',
+        }}
       >
-        {gotDoc && `Status: ${gotDoc}`}
+        Status: {gotDoc}
       </Typography>
     </Box>
   );
+
+
+
   
 
   // return (
