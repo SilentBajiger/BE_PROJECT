@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router';
-import axios from 'axios';
-import { Container, TextField, Button, Box, Typography, Paper } from '@mui/material';
+import React, { useState } from "react";
+import { useNavigate } from "react-router";
+import axios from "axios";
+import { Box, TextField, Button, Typography, Paper } from "@mui/material";
+import { motion } from "framer-motion";
 
 const SignUp = () => {
   const [user, setUser] = useState({
-    userId: '',
-    password: '',
+    userId: "",
+    password: "",
   });
 
   const navigate = useNavigate();
@@ -15,121 +16,114 @@ const SignUp = () => {
     e.preventDefault();
 
     try {
-      if (user.userId === '' || user.password === '') {
-        alert('Please fill all the fields');
+      if (user.userId === "" || user.password === "") {
+        alert("Please fill all the fields");
         return;
       }
 
-      const response = await axios.post('http://localhost:5000/user/signup', user);
+      const response = await axios.post(
+        "http://localhost:5000/user/signup",
+        user
+      );
 
       if (response.status !== 200) {
         alert(response.data.msg);
         return;
       }
+
       alert(response.data.msg);
-      navigate('/student/login');
-      setUser({ userId: '', password: '' });
+      setUser({ userId: "", password: "" });
+      navigate("/student/login");
     } catch (error) {
-      console.log('Error: ' + error);
+      console.log("Error: " + error);
     }
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 5 }}>
-      <Paper elevation={3} sx={{ padding: 3, borderRadius: 3 }}>
-        <Typography variant="h4" sx={{ textAlign: 'center', mb: 3, color: '#4E73DF' }}>
-          SignUp
-        </Typography>
+    <Box
+      sx={{
+        minHeight: "80vh",
+        minWidth: "100vw",
+        background: "linear-gradient(to right, #fffde7, #e1f5fe)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        px: 2,
+        py: 4,
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        style={{ width: "100%", maxWidth: "600px" }}
+      >
+        <Paper
+          elevation={5}
+          sx={{
+            p: 5,
+            borderRadius: 4,
+            backgroundColor: "#ffffff",
+            boxShadow: "0 6px 24px rgba(0,0,0,0.1)",
+          }}
+        >
+          <Typography
+            variant="h4"
+            align="center"
+            gutterBottom
+            sx={{ fontWeight: 700, color: "#4E73DF" }}
+          >
+            Student Signup
+          </Typography>
 
-        <form onSubmit={handleSignup}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <TextField
-              label="User ID"
-              variant="outlined"
-              fullWidth
-              required
-              value={user.userId}
-              onChange={(e) => setUser({ ...user, userId: e.target.value })}
-              sx={{ marginBottom: 2 }}
-            />
-            <TextField
-              label="Password"
-              variant="outlined"
-              type="password"
-              fullWidth
-              required
-              value={user.password}
-              onChange={(e) => setUser({ ...user, password: e.target.value })}
-              sx={{ marginBottom: 3 }}
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleSignup}
-              fullWidth
-              sx={{
-                padding: '12px',
-                textTransform: 'none',
-                backgroundColor: '#4E73DF',
-                '&:hover': {
-                  backgroundColor: '#3e65c1',
-                },
-              }}
+          <form onSubmit={handleSignup}>
+            <Box
+              sx={{ display: "flex", flexDirection: "column", gap: 3, mt: 2 }}
             >
-              Sign Up
-            </Button>
-          </Box>
-        </form>
-      </Paper>
-    </Container>
+              <TextField
+                label="User ID"
+                variant="outlined"
+                fullWidth
+                required
+                value={user.userId}
+                onChange={(e) => setUser({ ...user, userId: e.target.value })}
+              />
+              <TextField
+                label="Password"
+                variant="outlined"
+                type="password"
+                fullWidth
+                required
+                value={user.password}
+                onChange={(e) => setUser({ ...user, password: e.target.value })}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                size="large"
+                sx={{
+                  py: 1.4,
+                  fontWeight: "bold",
+                  background: "linear-gradient(135deg, #4E73DF, #6C5DD3)",
+                  color: "#fff",
+                  boxShadow: "0 4px 12px rgba(78, 115, 223, 0.3)",
+                  transition: "all 0.3s ease-in-out",
+                  "&:hover": {
+                    background: "linear-gradient(135deg, #3e65c1, #574fcf)",
+                    transform: "scale(1.03)",
+                    boxShadow: "0 6px 20px rgba(78, 115, 223, 0.4)",
+                  },
+                }}
+              >
+                Sign Up
+              </Button>
+            </Box>
+          </form>
+        </Paper>
+      </motion.div>
+    </Box>
   );
 };
 
 export default SignUp;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

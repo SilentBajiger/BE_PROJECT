@@ -6,7 +6,10 @@ import {
   Typography,
   Paper,
   Stack,
+  InputAdornment,
 } from '@mui/material';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LockIcon from '@mui/icons-material/Lock';
 
 const Login = ({ user, loggedIn, setLoggedIn, setUser }) => {
   const handleChange = (e) => {
@@ -31,17 +34,33 @@ const Login = ({ user, loggedIn, setLoggedIn, setUser }) => {
     <Box
       sx={{
         height: '100vh',
-        background: 'linear-gradient(to right, #f7f8fc, #dfe9f3)',
+        background: 'linear-gradient(to right,rgb(225, 193, 255),rgb(189, 235, 255))',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
       }}
     >
-      <Paper elevation={6} sx={{ p: 4, width: 350, borderRadius: 4 }}>
-        <Typography variant="h5" textAlign="center" fontWeight="bold" mb={3}>
+      <Paper
+        elevation={8}
+        sx={{
+          p: 5,
+          width: 380,
+          borderRadius: 5,
+          backgroundColor: '#ffffffdd',
+          boxShadow: '0 8px 30px rgba(0,0,0,0.1)',
+        }}
+      >
+        <Typography
+          variant="h4"
+          textAlign="center"
+          fontWeight="bold"
+          mb={3}
+          sx={{ color: '#2c3e50' }}
+        >
           🔐 Admin Login
         </Typography>
-        <Stack spacing={2}>
+
+        <Stack spacing={3}>
           <TextField
             label="User ID"
             name="userId"
@@ -49,6 +68,13 @@ const Login = ({ user, loggedIn, setLoggedIn, setUser }) => {
             onChange={handleChange}
             variant="outlined"
             fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <AccountCircleIcon color="action" />
+                </InputAdornment>
+              ),
+            }}
           />
           <TextField
             label="Password"
@@ -58,8 +84,28 @@ const Login = ({ user, loggedIn, setLoggedIn, setUser }) => {
             onChange={handleChange}
             variant="outlined"
             fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockIcon color="action" />
+                </InputAdornment>
+              ),
+            }}
           />
-          <Button variant="contained" color="primary" fullWidth onClick={handleSubmit}>
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={handleSubmit}
+            sx={{
+              py: 1.5,
+              fontWeight: 'bold',
+              fontSize: '16px',
+              background: 'linear-gradient(to right,rgb(231, 187, 255),rgb(180, 233, 255))',
+              '&:hover': {
+                background: 'linear-gradient(to right,rgb(255, 196, 253),rgb(192, 235, 255))',
+              },
+            }}
+          >
             Login
           </Button>
         </Stack>
@@ -69,66 +115,3 @@ const Login = ({ user, loggedIn, setLoggedIn, setUser }) => {
 };
 
 export default Login;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import React from 'react'
-// import { useState } from 'react'
-// import AdminDashBoard from './AdminDashBoard';
-// import axios from 'axios'
-// const Login = ({user,loggedIn,setLoggedIn,setUser}) => {
-
-//     // const [user,setUser] = useState({userId:'',password:''});
-//     // const [loggedIn,setLoggedIn] = useState(false);
-//     const handleChange = (e) =>{
-//         setUser({...user,[e.target.name]:e.target.value});
-//     }
-
-//     const handleSubmit = async (e) => {
-//         e.preventDefault();
-//         // setLoggedIn(true);
-//         // return;
-//         try {
-//           if (user.userId !== 'admin' || user.password !== 'admin') {
-//             alert('Please fill all the fields');
-//             return;
-//           }
-//           setLoggedIn(true);
-//           setUser({ userId: '', password: '' });
-//         } catch (error) {
-//           console.log('Error: ' + error);
-//         }
-//       };
-
-
-//   return (
-//     <div>
-
-       
-
-//             <div>
-
-//         Login
-
-//         <input type="text"  placeholder={"Enter UserId"} onChange={handleChange} value={user.userId} name={'userId'} />
-//         <input type="text"  placeholder={"Enter UserId"} onChange={handleChange} value={user.password} name={'password'} />
-//         <button onClick={handleSubmit}>login</button>
-//         </div>
-        
-
-//     </div>
-//   )
-// }
-
-// export default Login

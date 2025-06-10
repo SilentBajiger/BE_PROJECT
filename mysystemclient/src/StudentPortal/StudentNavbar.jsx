@@ -1,44 +1,53 @@
 import React from 'react';
-import { Link } from 'react-router';
-import { AppBar, Toolbar, Button, Box, styled } from '@mui/material';
+import { Link } from 'react-router-dom';
+import { AppBar, Toolbar, Button, Box, styled, Typography } from '@mui/material';
+import SchoolIcon from '@mui/icons-material/School';
 
-// Styled Link component to work with MUI
 const StyledLink = styled(Link)(({ theme }) => ({
   textDecoration: 'none',
-  color: theme.palette.common.white,
-  margin: theme.spacing(0, 1),
+}));
+
+const NavButton = styled(Button)(({ theme }) => ({
+  color: 'white',
+  fontWeight: 'bold',
+  transition: 'all 0.3s ease',
   '&:hover': {
-    color: theme.palette.secondary.main,
+    transform: 'scale(1.05)',
+    backgroundColor: 'rgba(255,255,255,0.2)',
   },
 }));
 
 const StudentNavbar = () => {
   return (
-    <AppBar position="static" sx={{ bgcolor: 'primary.main', boxShadow: 'none' }}>
-      <Toolbar sx={{ justifyContent: 'center', minHeight: '64px' }}>
-        <Box sx={{ display: 'flex', width: '100%', maxWidth: '800px', justifyContent: 'space-evenly' }}>
-          <StyledLink to={'/student/login'}>
-            <Button color="inherit" sx={{ fontWeight: 'medium' }}>
-              Login
-            </Button>
+    <AppBar
+      position="static"
+      sx={{
+        background: 'linear-gradient(to right, #4E73DF, #6C5CE7)',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+      }}
+    >
+      <Toolbar sx={{ justifyContent: 'space-between' }}>
+        {/* Left Side - Logo or Title */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <SchoolIcon sx={{ color: 'white' }} />
+          <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
+            Student Portal
+          </Typography>
+        </Box>
+
+        {/* Right Side - Links */}
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <StyledLink to="/student/login">
+            <NavButton>Login</NavButton>
           </StyledLink>
-          
-          <StyledLink to={'/student/signup'}>
-            <Button color="inherit" sx={{ fontWeight: 'medium' }}>
-              Signup
-            </Button>
+          <StyledLink to="/student/signup">
+            <NavButton>Signup</NavButton>
           </StyledLink>
-          
-          <StyledLink to={'/student/student-page'}>
-            <Button color="inherit" sx={{ fontWeight: 'medium' }}>
-              Dashboard
-            </Button>
+          <StyledLink to="/student/student-page">
+            <NavButton>Dashboard</NavButton>
           </StyledLink>
-          
-          <StyledLink to={'/'}>
-            <Button color="inherit" sx={{ fontWeight: 'medium' }}>
-              Home
-            </Button>
+          <StyledLink to="/">
+            <NavButton>Home</NavButton>
           </StyledLink>
         </Box>
       </Toolbar>
@@ -47,9 +56,3 @@ const StudentNavbar = () => {
 };
 
 export default StudentNavbar;
-
-
-
-
-
-

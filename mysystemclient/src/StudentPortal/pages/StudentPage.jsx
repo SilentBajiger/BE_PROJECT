@@ -2,7 +2,15 @@ import React, { useEffect, useState } from 'react';
 import Upload from './components/Upload';
 import Uploaded from './components/Uploaded';
 import { useNavigate } from 'react-router';
-import { Button, Container, Typography, Paper, Box, Snackbar } from '@mui/material';
+import {
+  Button,
+  Container,
+  Typography,
+  Paper,
+  Box,
+  Snackbar,
+} from '@mui/material';
+import { motion } from 'framer-motion';
 
 const StudentPage = () => {
   const [upload, setUpload] = useState(true);
@@ -10,8 +18,9 @@ const StudentPage = () => {
   const [btnDisabled, setBtnDisabled] = useState(true);
   const [utext, setUText] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [userId,setUserId] = useState('');
-  const [uploading,setUploading] = useState(false);
+  const [userId, setUserId] = useState('');
+  const [uploading, setUploading] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,11 +33,7 @@ const StudentPage = () => {
   }, [navigate]);
 
   useEffect(() => {
-    if (upload) {
-      setText('See Uploaded Documents');
-    } else {
-      setText('Upload a Document');
-    }
+    setText(upload ? 'See Uploaded Documents' : 'Upload a Document');
   }, [upload]);
 
   const handleSnackbarClose = () => {
@@ -36,73 +41,94 @@ const StudentPage = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 5 }}>
-      <Paper elevation={3} sx={{ padding: 3, borderRadius: 3 }}>
-        <Typography variant="h4" sx={{ textAlign: 'center', mb: 3, color: '#4E73DF' }}>
-          Student Profile Page
-        </Typography>
+    <Box
+      sx={{
+        height: '85vh',
+        width: '100%',
+        background: 'linear-gradient(to right,rgb(220, 254, 255),rgb(248, 255, 216))',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        px: 2,
+        py: 4,
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        style={{ width: '100%', maxWidth: '800px' }}
+      >
+        <Paper
+          elevation={4}
+          sx={{
+            padding: 4,
+            borderRadius: 4,
+            boxShadow: '0 4px 24px rgba(0, 0, 0, 0.1)',
+          }}
+        >
+          <Typography
+            variant="h4"
+            align="center"
+            gutterBottom
+            sx={{ fontWeight: 600, color: '#4E73DF' }}
+          >
+            Student Profile
+          </Typography>
 
-        <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              setUpload(!upload);
-              // setClicked(true);
-              // setBtnDisabled(true);
-              setUText('');
-            }}
+          <Box
             sx={{
-              padding: '10px 20px',
-              textTransform: 'none',
-              backgroundColor: '#4E73DF',
-              '&:hover': {
-                backgroundColor: '#3e65c1',
-              },
+              display: 'flex',
+              justifyContent: 'center',
+              mt: 3,
+              mb: 4,
             }}
           >
-            {text}
-          </Button>
+            <Button
+              variant="contained"
+              onClick={() => {
+                setUpload(!upload);
+                setUText('');
+              }}
+              sx={{
+                padding: '10px 25px',
+                textTransform: 'none',
+                fontWeight: 'bold',
+                backgroundColor: '#4E73DF',
+                '&:hover': {
+                  backgroundColor: '#3e65c1',
+                },
+              }}
+            >
+              {text}
+            </Button>
+          </Box>
 
-          {upload ? (
-            <Upload uploading={uploading} setUploading={setUploading} btnDisabled={btnDisabled} setBtnDisabled={setBtnDisabled} text={utext} setText={setUText} />
-          ) : (
-            <Uploaded userId={userId} setUserId={setUserId} />
-          )}
-        </Box>
-      </Paper>
+          <Box sx={{ px: 1 }}>
+            {upload ? (
+              <Upload
+                uploading={uploading}
+                setUploading={setUploading}
+                btnDisabled={btnDisabled}
+                setBtnDisabled={setBtnDisabled}
+                text={utext}
+                setText={setUText}
+              />
+            ) : (
+              <Uploaded userId={userId} setUserId={setUserId} />
+            )}
+          </Box>
+        </Paper>
 
-      {/* Snackbar for feedback */}
-      <Snackbar
-        open={openSnackbar}
-        onClose={handleSnackbarClose}
-        message="Action completed successfully"
-        autoHideDuration={3000}
-      />
-    </Container>
+        <Snackbar
+          open={openSnackbar}
+          onClose={handleSnackbarClose}
+          message="Action completed successfully"
+          autoHideDuration={3000}
+        />
+      </motion.div>
+    </Box>
   );
 };
 
 export default StudentPage;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

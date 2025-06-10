@@ -8,8 +8,11 @@ import {
   Link as MuiLink,
   Divider,
   Grid,
-  Paper,
+  Chip,
+  Tooltip,
 } from '@mui/material';
+import FolderSharedIcon from '@mui/icons-material/FolderShared';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 
 const AdminDashBoard = () => {
   const [docs, setDocs] = useState([]);
@@ -34,11 +37,18 @@ const AdminDashBoard = () => {
         p: 4,
         pt: 10,
         minHeight: '100vh',
-        background: 'linear-gradient(to right, #f4f7f8, #eef2f3)',
+        background: 'linear-gradient(to right, #e0eafc, #cfdef3)',
       }}
     >
-      <Typography variant="h3" fontWeight="bold" gutterBottom align="center" sx={{ mb: 4, color: '#2c3e50' }}>
-        📁 Admin Dashboard
+      <Typography
+        variant="h3"
+        fontWeight="bold"
+        gutterBottom
+        align="center"
+        sx={{ mb: 5, color: '#2c3e50' }}
+      >
+        <FolderSharedIcon sx={{ mr: 1, fontSize: 40, color: '#4E73DF' }} />
+        Admin Dashboard
       </Typography>
 
       <Grid container spacing={4}>
@@ -47,39 +57,69 @@ const AdminDashBoard = () => {
             <Card
               sx={{
                 borderRadius: 4,
-                boxShadow: 5,
-                backgroundColor: '#ffffffdd',
-                transition: 'transform 0.2s',
+                boxShadow: 6,
+                backgroundColor: '#ffffff',
+                transition: 'transform 0.3s ease-in-out',
+                border: '1px solid #e0e0e0',
                 '&:hover': {
-                  transform: 'scale(1.02)',
+                  transform: 'translateY(-5px)',
+                  boxShadow: 10,
                 },
               }}
             >
               <CardContent>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#34495e' }}>
-                  👤 User ID: {user.userId}
-                </Typography>
-                <Divider sx={{ my: 1 }} />
-                <Typography variant="subtitle1" fontWeight="medium" sx={{ color: '#7f8c8d' }}>
-                  Documents:
-                </Typography>
-                {user?.documents?.map((doc, idx) => (
-                  <MuiLink
-                    key={idx}
-                    href={doc.url}
-                    target="_blank"
-                    rel="noopener"
-                    underline="hover"
-                    display="block"
-                    sx={{
-                      mt: 1,
-                      color: '#2980b9',
-                      '&:hover': { color: '#1abc9c' },
-                    }}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mb: 1,
+                  }}
+                >
+                  <Typography
+                    variant="h6"
+                    sx={{ fontWeight: 'bold', color: '#34495e' }}
                   >
-                    📄 {doc.fileName}
-                  </MuiLink>
-                ))}
+                    👤 User
+                  </Typography>
+                  <Chip
+                    label={`ID: ${user.userId}`}
+                    sx={{
+                      background: 'linear-gradient(to right, #4E73DF, #6A89CC)',
+                      color: 'white',
+                      fontWeight: 'bold',
+                    }}
+                  />
+                </Box>
+                <Divider sx={{ my: 1 }} />
+                <Typography variant="subtitle1" sx={{ color: '#7f8c8d' }}>
+                  Uploaded Documents:
+                </Typography>
+                {user?.documents?.length === 0 ? (
+                  <Typography sx={{ mt: 1, color: 'gray' }}>No documents found.</Typography>
+                ) : (
+                  user?.documents?.map((doc, idx) => (
+                    <Tooltip key={idx} title="View Document" arrow>
+                      <MuiLink
+                        href={doc.url}
+                        target="_blank"
+                        rel="noopener"
+                        underline="hover"
+                        display="flex"
+                        alignItems="center"
+                        sx={{
+                          mt: 1,
+                          color: '#2980b9',
+                          fontWeight: 500,
+                          '&:hover': { color: '#1abc9c' },
+                        }}
+                      >
+                        <InsertDriveFileIcon fontSize="small" sx={{ mr: 1 }} />
+                        {doc.fileName}
+                      </MuiLink>
+                    </Tooltip>
+                  ))
+                )}
               </CardContent>
             </Card>
           </Grid>
@@ -90,98 +130,3 @@ const AdminDashBoard = () => {
 };
 
 export default AdminDashBoard;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import React from 'react'
-// import { useState } from 'react'
-// import axios from 'axios';
-// import { useEffect } from 'react';
-
-// const AdminDashBoard = () => {
-
-//     const [docs,setDocs] = useState([]);
-
-
-//     const fetchDocs = async()=>{
-//         try {
-//             const response = await axios.get('http://localhost:5001/admin/get-docs');
-//             console.log(response);
-//             setDocs(response.data.docs);
-//         } catch (error) {
-//             alert('errror');
-//             console.log(error);
-//         }
-//     }
-//     useEffect(()=>{
-//         fetchDocs();
-//     },[])
-
-    
-//   return (
-//     <div>AdminDashBoardertet
-
-
-//         {docs?.map((item,index)=><div key={index}>
-//             <p>Name : {item.userId}</p>
-//             <h1>Documents : </h1>
-//             <br />
-//             {
-//                 item?.documents?.map((item,index)=>
-//                     <div key={index}>
-//                         {/* <h1>fileName : {item.fileName}</h1> */}
-//                         <a href={item.url}>{item.fileName}</a>
-//                     </div>
-//                 )
-//             }
-
-//         </div>)}
-
-//     </div>
-//   )
-// }
-
-// export default AdminDashBoard

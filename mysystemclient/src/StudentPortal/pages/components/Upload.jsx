@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useRef, useState } from "react";
+import axios from "axios";
 import {
   Box,
   Button,
@@ -7,115 +7,101 @@ import {
   Snackbar,
   Typography,
   Paper,
-  IconButton,
   Alert,
   TextField,
-  LinearProgress
-} from '@mui/material';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+  LinearProgress,
+} from "@mui/material";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { keyframes } from "@emotion/react";
+import { motion } from "framer-motion";
+import { useSocket } from "../../../Context/ContextProvider";
 
-import { keyframes } from '@emotion/react';
-import { useSocket } from '../../../Context/ContextProvider';
-
-// Define gradient animation
+// Gradient animation for progress bar
 const gradientAnimation = keyframes`
-  0% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-  
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 `;
 
-const Upload = ({ btnDisabled, setBtnDisabled, text, setText, uploading, setUploading }) => {
+const Upload = ({
+  btnDisabled,
+  setBtnDisabled,
+  text,
+  setText,
+  uploading,
+  setUploading,
+}) => {
   const [file, setFile] = useState(null);
   const [response, setResponse] = useState(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-  const [btnText, setBtnText] = useState('Upload');
-  const [digilocker_user_id,set_digilocker_user_id] = useState('');
-  const [digilocker_password,set_digilocker_password] = useState('');
-  const [progressVal,setProgressVal] = useState(0);
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [btnText, setBtnText] = useState("Upload");
+  const [digilocker_user_id, set_digilocker_user_id] = useState("");
+  const [digilocker_password, set_digilocker_password] = useState("");
+  const [progressVal, setProgressVal] = useState(0);
   const fileInputRef = useRef(null);
   const socket = useSocket();
 
+  useEffect(() => {
+    if (!socket) return;
+    socket.on("progressUp", (data) => setProgressVal(data?.value));
+    return () => socket.off("progressUp");
+  }, [socket]);
 
   useEffect(() => {
-    console.log("SOCKET CHECK")
-    if (!socket) return;
-    console.log("SOCKET PRESENTY")
-
-    socket.on('progressUp', (data) => {
-      console.log('Document Uploaded:', data);
-      setProgressVal(data?.value)
-      console.log("8888888888")
-      // show toast or update UI
-    });
-
-    return () => {
-      socket.off('documentUploaded');
-    };
-  }, [socket]);
+    if (digilocker_user_id && digilocker_password && file)
+      setBtnDisabled(false);
+    else setBtnDisabled(true);
+  }, [digilocker_user_id, digilocker_password, file]);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
-    setBtnText('Upload');
-    setText('');
+    setBtnText("Upload");
+    setText("");
     setUploading(false);
     setProgressVal(0);
-    // setBtnDisabled(false);
   };
-  useEffect(()=>{
-    setText('');
-  },[])
-  useEffect(()=>{
-    // setBtnDisabled(false);
-    if(digilocker_user_id && digilocker_password && file) setBtnDisabled(false);
-    if(!digilocker_user_id || !digilocker_password) setBtnDisabled(true);
-  },[digilocker_user_id,digilocker_password,file])
 
   const handleUpload = async () => {
-    if (!file) return alert('Please select a file');
-    if(!digilocker_password || !digilocker_user_id){
-      alert("Fill All the Fields");
+    if (!file || !digilocker_user_id || !digilocker_password) {
+      alert("Please fill all fields and select a file");
       return;
     }
-    setBtnDisabled(true);
-    const formData = new FormData();
-    formData.append('file', file);
-    const token = localStorage.getItem('system-token');
-    const user = JSON.parse(token);
-    if (!user) {
-      alert('You are an unauthorized person');
-      return;
-    }
-    
 
-    formData.append('userId', user.userId);
-    formData.append('password', user.password);
-    formData.append('digilocker_password', digilocker_password);
-    formData.append('digilocker_user_id', digilocker_user_id);
+    const formData = new FormData();
+    formData.append("file", file);
+    const user = JSON.parse(localStorage.getItem("system-token"));
+    if (!user) {
+      alert("Unauthorized");
+      return;
+    }
+
+    formData.append("userId", user.userId);
+    formData.append("password", user.password);
+    formData.append("digilocker_password", digilocker_password);
+    formData.append("digilocker_user_id", digilocker_user_id);
+
     setUploading(true);
+    setBtnDisabled(true);
 
     try {
-      const res = await axios.post('http://localhost:5000/doc/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      console.log("Upload response .: " + JSON.stringify(res));
+      const res = await axios.post(
+        "http://localhost:5000/doc/upload",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
       setResponse(res.data);
-      setSnackbarSeverity('success');
+      setSnackbarSeverity("success");
       setOpenSnackbar(true);
-      setText('File Uploaded Successfully!');
-      setBtnText('Uploaded ✅');
+      setText("File Uploaded Successfully!");
+      setBtnText("Uploaded ✅");
       setFile(null);
-      setBtnDisabled(false);
       setUploading(false);
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     } catch (err) {
-      console.error(err);
-      setSnackbarSeverity('error');
+      setSnackbarSeverity("error");
       setResponse({ msg: err?.response?.data?.msg });
       setOpenSnackbar(true);
       setUploading(false);
@@ -123,132 +109,165 @@ const Upload = ({ btnDisabled, setBtnDisabled, text, setText, uploading, setUplo
     }
   };
 
-  const handleSnackbarClose = () => {
-    setOpenSnackbar(false);
-  };
-
   return (
     <Box
       sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '50vh',
-        backgroundColor: '#f5f5f5',
-        padding: 4,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "60vh",
+        minWidth: "99vh",
+        background: "linear-gradient(to right, #f3e5f5, #e0f7fa)",
+        px: 2,
       }}
     >
-      <Paper elevation={4} sx={{ p: 4, borderRadius: 4, width: 400, textAlign: 'center' }}>
-        <Typography variant="h5" gutterBottom fontWeight={600}>
-          Upload Your Document
-        </Typography>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <TextField
-                      label="Digilocker UserId"
-                      variant="outlined"
-                      fullWidth
-                      required
-                      value={digilocker_user_id}
-                      onChange={(e) => set_digilocker_user_id(e.target.value)}
-                      sx={{ marginBottom: 2 }}
-                    />
-                    <TextField
-                      label="Digilocker Password"
-                      variant="outlined"
-                      type="password"
-                      fullWidth
-                      required
-                      value={digilocker_password}
-                      onChange={(e) => set_digilocker_password(e.target.value)}
-                      sx={{ marginBottom: 3 }}
-                    />
-                   
-                  </Box>
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleFileChange}
-          style={{ display: 'none' }}
-          id="file-input"
-        />
-        <label htmlFor="file-input">
-          <Button
-            variant="outlined"
-            component="span"
-            color="primary"
-            startIcon={<UploadFileIcon />}
-            fullWidth
-            sx={{ my: 2 }}
+      <motion.div
+        initial={{ opacity: 0, y: -30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        style={{ width: "100%", maxWidth: "600px" }}
+      >
+        <Paper
+          elevation={6}
+          sx={{ p: 4, borderRadius: 4, textAlign: "center" }}
+        >
+          <Typography
+            variant="h5"
+            fontWeight={600}
+            color="#4E73DF"
+            gutterBottom
           >
-            Choose File
-          </Button>
-        </label>
+            Upload Your Document
+          </Typography>
+
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
+            <TextField
+              label="Digilocker User ID"
+              variant="outlined"
+              fullWidth
+              required
+              value={digilocker_user_id}
+              onChange={(e) => set_digilocker_user_id(e.target.value)}
+            />
+            <TextField
+              label="Digilocker Password"
+              variant="outlined"
+              type="password"
+              fullWidth
+              required
+              value={digilocker_password}
+              onChange={(e) => set_digilocker_password(e.target.value)}
+            />
+
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              style={{ display: "none" }}
+              id="file-input"
+            />
+            <label htmlFor="file-input">
+              <Button
+                variant="contained"
+                component="span"
+                startIcon={<UploadFileIcon />}
+                fullWidth
+                sx={{
+                  py: 1.4,
+                  fontWeight: "bold",
+                  borderRadius: 2,
+                  color: "#fff",
+                  background: "linear-gradient(90deg, #4E73DF, #6A89F7)",
+                  backgroundSize: "200% 100%",
+                  transition: "all 0.4s ease",
+                  animation: "gradientMove 4s linear infinite",
+                  "&:hover": {
+                    backgroundPosition: "right center",
+                    boxShadow: "0 4px 20px rgba(78, 115, 223, 0.4)",
+                  },
+                  "@keyframes gradientMove": {
+                    "0%": {
+                      backgroundPosition: "0% 50%",
+                    },
+                    "100%": {
+                      backgroundPosition: "100% 50%",
+                    },
+                  },
+                }}
+              >
+                Choose File
+              </Button>
+            </label>
 
             {file && (
-                <Typography
-                variant="body2"
-                sx={{
-                    mb: 2,
-                    color: 'text.secondary',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    maxWidth: '100%',
-                }}
-                >
+              <Typography variant="body2" color="text.secondary" noWrap>
                 Selected: {file.name}
-                </Typography>
+              </Typography>
             )}
 
-        <Button
-          variant="contained"
-          color="success"
-          onClick={handleUpload}
-          startIcon={!uploading && <CloudUploadIcon />}
-          disabled={btnDisabled}
-          fullWidth
-          sx={{ mb: 2 }}
+            <Button
+              variant="contained"
+              onClick={handleUpload}
+              startIcon={!uploading && <CloudUploadIcon />}
+              disabled={btnDisabled}
+              fullWidth
+              sx={{
+                py: 1.4,
+                fontWeight: "bold",
+                background: "linear-gradient(135deg, #4E73DF, #6C5DD3)",
+                color: "#fff",
+                boxShadow: "0 4px 12px rgba(78, 115, 223, 0.3)",
+                transition: "all 0.3s ease-in-out",
+                "&:hover": {
+                  background: "linear-gradient(135deg, #3e65c1, #574fcf)",
+                  transform: "scale(1.03)",
+                  boxShadow: "0 6px 20px rgba(78, 115, 223, 0.4)",
+                },
+              }}
+            >
+              {uploading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                btnText
+              )}
+            </Button>
+
+            <LinearProgress
+              variant="determinate"
+              value={progressVal}
+              sx={{
+                height: 7,
+                borderRadius: 6,
+                backgroundColor: "#e0e0e0",
+                "& .MuiLinearProgress-bar": {
+                  borderRadius: 6,
+                  backgroundImage:
+                    "linear-gradient(270deg, #ff6ec4, #7873f5, #4ADEDE, #C984FF, #ff6ec4)",
+                  backgroundSize: "600% 600%",
+                  animation: `${gradientAnimation} 4s linear infinite`,
+                },
+              }}
+            />
+
+            {text && (
+              <Typography variant="body1" color="green" fontWeight={500}>
+                {text}
+              </Typography>
+            )}
+          </Box>
+        </Paper>
+
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000}
+          onClose={() => setOpenSnackbar(false)}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         >
-          
-          {uploading ? <CircularProgress size={24} color="inherit" /> : btnText}
-        </Button>
-        <Box sx={{ width: '100%' }}>
-      <LinearProgress
-        variant="determinate"
-        value={progressVal}
-        sx={{
-          height: 7,
-          borderRadius: 6,
-          backgroundColor: '#e0e0e0',
-          '& .MuiLinearProgress-bar': {
-            borderRadius: 6,
-            backgroundImage: 'linear-gradient(270deg, #ff6ec4, #7873f5, #4ADEDE, #C984FF, #ff6ec4)',
-            backgroundSize: '600% 600%',
-            animation: `${gradientAnimation} 4s linear infinite`,
-          },
-        }}
-      />
-    </Box>
-        {/* <Typography>{progressVal}</Typography> */}
-
-        {text?.length > 0 && (
-          <Typography variant="body1" color="green" fontWeight={500}>
-            {text}
-          </Typography>
-        )}
-      </Paper>
-      
-
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert severity={snackbarSeverity} onClose={handleSnackbarClose} sx={{ width: '100%' }}>
-          {response ? response.msg : 'Something went wrong.'}
-        </Alert>
-      </Snackbar>
+          <Alert severity={snackbarSeverity} sx={{ width: "100%" }}>
+            {response ? response.msg : "Something went wrong."}
+          </Alert>
+        </Snackbar>
+      </motion.div>
     </Box>
   );
 };
